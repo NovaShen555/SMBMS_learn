@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="SMBMS_learn:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/SMBMS_learn_war_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="SMBMS_learn/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="SMBMS_learn" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
