@@ -13,6 +13,10 @@
         <filter-name>CharacterEncodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>top.novashen.servlet.LoginServlet</servlet-class>
+    </servlet>
 
     <welcome-file-list>
         <welcome-file>/login.jsp</welcome-file>
