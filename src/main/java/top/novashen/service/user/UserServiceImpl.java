@@ -22,14 +22,22 @@ public class UserServiceImpl implements UserService{
     @Override
     public User login(String userCode, String password) throws SQLException, ClassNotFoundException {
         Connection connection = null;
-        User user = null;
+//        User user = null;
+
+        //通过业务层调用dao层，实现操作数据库
+        System.out.println("userCode is "+userCode);
 
         connection = BaseDao.getConnection();
-        //通过业务层调用dao层，实现操作数据库
-        user = userDao.getLoginUser(connection,userCode);
+        User user = userDao.getLoginUser(connection,userCode);
 
         BaseDao.closeResources(connection,null,null);
-        return user;
+
+        System.out.println("passWord is "+user.getUserPassword());
+        if (user != null && password.equals(user.getUserPassword())) {
+            return user;
+        } else {
+            return null;
+        }
     }
 
 }

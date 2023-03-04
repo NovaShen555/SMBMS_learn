@@ -28,6 +28,12 @@ public class LoginServlet extends HttpServlet {
                 //保存用户所有信息进入session
                 System.out.println("Store User in Session");
                 request.getSession().setAttribute(Constants.USER_SESSION,user);
+                //重定向至后台页面
+                response.sendRedirect("jsp/frame.jsp");
+            }
+            else { //查无此人或密码错误
+                request.setAttribute("error","用户名或密码不正确");
+                request.getRequestDispatcher("login.jsp").forward(request,response);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

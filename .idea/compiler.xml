@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="17">
-      <module name="SMBMS_learn" target="1.6" />
+      <module name="SMBMS_learn" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -16,7 +16,7 @@ public class UserDaoImpl implements UserDao{
         ResultSet resultSet = null;
         User user = null;
 
-        String sql = "select * from `smbms_user` where userCode = ?";
+        String sql = "select * from `smbms_user` where `userCode` = ?";
         Object[] params = {userCode};
 
         if (connection!=null) {
