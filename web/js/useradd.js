@@ -1,4 +1,4 @@
-var userCode = null;
+﻿var userCode = null;
 var userName = null;
 var userPassword = null;
 var ruserPassword = null;

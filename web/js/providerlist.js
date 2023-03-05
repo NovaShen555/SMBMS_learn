@@ -1,4 +1,4 @@
-var providerObj;
+﻿var providerObj;
 
 //供应商管理页面上点击删除按钮弹出删除框(providerlist.jsp)
 function deleteProvider(obj){

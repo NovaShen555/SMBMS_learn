@@ -1,4 +1,4 @@
-//时间
+﻿//时间
 function fn(){
     var time = new Date();
     var str= "";

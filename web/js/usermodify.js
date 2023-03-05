@@ -1,4 +1,4 @@
-var userName = null;
+﻿var userName = null;
 var birthday = null;
 var phone = null;
 var userRole = null;

@@ -1,4 +1,4 @@
-var backBtn = null;
+﻿var backBtn = null;
 
 $(function(){
 	backBtn = $("#back");

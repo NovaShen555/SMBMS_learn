@@ -1,4 +1,4 @@
-var billCode = null;
+﻿var billCode = null;
 var productName = null;
 var productUnit = null;
 var productCount = null;
