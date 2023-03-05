@@ -32,12 +32,27 @@ public class UserServiceImpl implements UserService{
 
         BaseDao.closeResources(connection,null,null);
 
-        System.out.println("passWord is "+user.getUserPassword());
+//        System.out.println("passWord is "+user.getUserPassword());
         if (user != null && password.equals(user.getUserPassword())) {
             return user;
         } else {
             return null;
         }
+    }
+
+    @Override
+    public Boolean updatePassword(int id, String password) throws SQLException, ClassNotFoundException {
+
+        Connection connection = null;
+        connection = BaseDao.getConnection();
+
+        int result = userDao.updatePassword(connection, id, password);
+
+        BaseDao.closeResources(connection,null,null);
+
+        //01正常返回，若超过1则说明有问题，需要回滚（没必要，先不写，就这样）
+        return result == 1;
+
     }
 
 }

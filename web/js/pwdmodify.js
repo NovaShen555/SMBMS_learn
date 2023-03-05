@@ -20,13 +20,13 @@ $(function(){
 			data:{method:"pwdmodify",oldpassword:oldpassword.val()},
 			dataType:"json",
 			success:function(data){
-				if(data.result == "true"){//旧密码正确
+				if(data.result === "true"){//旧密码正确
 					validateTip(oldpassword.next(),{"color":"green"},imgYes,true);
-				}else if(data.result == "false"){//旧密码输入不正确
+				}else if(data.result === "false"){//旧密码输入不正确
 					validateTip(oldpassword.next(),{"color":"red"},imgNo + " 原密码输入不正确",false);
-				}else if(data.result == "sessionerror"){//当前用户session过期，请重新登录
+				}else if(data.result === "sessionerror"){//当前用户session过期，请重新登录
 					validateTip(oldpassword.next(),{"color":"red"},imgNo + " 当前用户session过期，请重新登录",false);
-				}else if(data.result == "error"){//旧密码输入为空
+				}else if(data.result === "error"){//旧密码输入为空
 					validateTip(oldpassword.next(),{"color":"red"},imgNo + " 请输入旧密码",false);
 				}
 			},

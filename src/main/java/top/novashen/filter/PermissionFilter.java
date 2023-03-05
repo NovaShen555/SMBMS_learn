@@ -28,8 +28,9 @@ public class PermissionFilter implements Filter {
         if (user == null){
             servletResponse.sendRedirect(servletRequest.getContextPath()+"/error.jsp");
             System.out.println("Permission denied");
+            return;
         }
-        System.out.println("doFiltering...");
+//        System.out.println("doFiltering...");
         chain.doFilter(request, response);
     }
 }

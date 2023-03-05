@@ -43,4 +43,23 @@ public class UserDaoImpl implements UserDao{
 
         return user;
     }
+
+    @Override
+    public int updatePassword(Connection connection, int id, String password) throws SQLException {
+
+        PreparedStatement statement = null;
+        int result = 0;
+
+        String sql = "update smbms_user set `userPassword` = ? where `id` = ?";
+        Object[] params = {password, id};
+
+        if (connection!=null) {
+            result = BaseDao.execute(connection, sql, params, statement);
+        }
+        //连接属于业务层，从上级传下来的东西不要动，让上级关
+        BaseDao.closeResources(null,statement,null);
+
+        //返回受影响的行数
+        return result;
+    }
 }

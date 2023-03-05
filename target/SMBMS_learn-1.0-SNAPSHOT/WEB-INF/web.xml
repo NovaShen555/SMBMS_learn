@@ -44,7 +44,16 @@
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/jsp/logout.do</url-pattern>
     </servlet-mapping>
+
     
+    <servlet>
+        <servlet-name>UserServlet</servlet-name>
+        <servlet-class>top.novashen.servlet.UserServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UserServlet</servlet-name>
+        <url-pattern>/jsp/user.do</url-pattern>
+    </servlet-mapping>
     
     
     <welcome-file-list>
