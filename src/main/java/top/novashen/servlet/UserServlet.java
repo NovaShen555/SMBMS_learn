@@ -7,6 +7,7 @@ import top.novashen.pojo.User;
 import top.novashen.service.user.UserService;
 import top.novashen.service.user.UserServiceImpl;
 import top.novashen.util.Constants;
+import top.novashen.util.PageSupport;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -29,6 +30,8 @@ public class UserServlet extends HttpServlet {
             this.updatePassword(request, response);
         } else if (method.equals("pwdmodify")) {
             this.verifyPassword(request, response);
+        } else if (method.equals("query")) {
+            this.userQuery(request, response);
         }
     }
 
@@ -97,6 +100,54 @@ public class UserServlet extends HttpServlet {
             writer.flush();
             writer.close();
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    //查询用户？
+    private void userQuery(HttpServletRequest request, HttpServletResponse response){
+
+        //要查的名字
+        String userName = request.getParameter("queryname");
+        //要查的角色
+        String userRole = request.getParameter("queryUserRole");
+        //当前页码
+        String pageIndex = request.getParameter("pageIndex");
+
+        int userRoleId = 0;
+        int pageSize = Constants.PAGE_SIZE;
+        int currentPageNo = 1;
+
+        UserService userService = new UserServiceImpl();
+
+        //判断前端值是否合法并赋值
+        if (userName == null) userName = "";
+        if (!StringUtils.isNullOrEmpty(userRole)) userRoleId = Integer.parseInt(userRole);
+        if (!StringUtils.isNullOrEmpty(pageIndex)) currentPageNo = Integer.parseInt(pageIndex);
+
+        //获取用户总数
+        try {
+            int userCount = userService.getUserCount(userName, userRoleId);
+            //为了支持其上一页和下一页的操作
+            PageSupport pageSupport = new PageSupport();
+            pageSupport.setCurrentPageNo(currentPageNo);
+            pageSupport.setPageSize(pageSize);
+            pageSupport.setTotalPageCount(userCount);
+
+            int totalPageCount = pageSupport.getTotalPageCount();
+            //首页不往前，末页不往后
+            if (currentPageNo<1){
+                currentPageNo = 1;
+            } else if (currentPageNo > totalPageCount) {
+                currentPageNo = totalPageCount;
+            }
+
+            //获取角色列表
+
+
+
+        } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
 
