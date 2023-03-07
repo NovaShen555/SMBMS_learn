@@ -3,7 +3,11 @@ package top.novashen.servlet;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.mysql.cj.util.StringUtils;
+import top.novashen.dao.role.RoleDaoImpl;
+import top.novashen.pojo.Role;
 import top.novashen.pojo.User;
+import top.novashen.service.role.RoleService;
+import top.novashen.service.role.RoleServiceImpl;
 import top.novashen.service.user.UserService;
 import top.novashen.service.user.UserServiceImpl;
 import top.novashen.util.Constants;
@@ -17,6 +21,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 
 
 //与user有关的所有提交到这里
@@ -129,25 +134,60 @@ public class UserServlet extends HttpServlet {
         //获取用户总数
         try {
             int userCount = userService.getUserCount(userName, userRoleId);
-            //为了支持其上一页和下一页的操作
-            PageSupport pageSupport = new PageSupport();
-            pageSupport.setCurrentPageNo(currentPageNo);
-            pageSupport.setPageSize(pageSize);
-            pageSupport.setTotalPageCount(userCount);
+//            //为了支持其上一页和下一页的操作
+//            PageSupport pageSupport = new PageSupport();
+//            pageSupport.setCurrentPageNo(currentPageNo);
+//            pageSupport.setPageSize(pageSize);
+//            pageSupport.setTotalPageCount(userCount);
 
-            int totalPageCount = pageSupport.getTotalPageCount();
-            //首页不往前，末页不往后
-            if (currentPageNo<1){
-                currentPageNo = 1;
-            } else if (currentPageNo > totalPageCount) {
-                currentPageNo = totalPageCount;
+            if (userCount > 0) {//如果有数据
+                int totalPageCount = userCount % pageSize == 0 ? userCount / pageSize : userCount / pageSize + 1;
+                //首页不往前，末页不往后
+                if (currentPageNo < 1) {
+                    currentPageNo = 1;
+                } else if (currentPageNo > totalPageCount) {
+                    currentPageNo = totalPageCount;
+                }
+
+                System.out.println("Current Page No " + currentPageNo + " Total Page Count " + totalPageCount);
+
+                //获取用户列表
+                List<User> userList = userService.getUserList(userName, userRoleId, currentPageNo, pageSize);
+                //将列表设置进回应
+                request.setAttribute("userList", userList);
+
+                //获取角色列表 并返回
+                RoleService roleService = new RoleServiceImpl();
+                List<Role> roleList = roleService.getRoleList();
+                request.setAttribute("roleList", roleList);
+
+                //放回当前页数等信息
+                request.setAttribute("totalCount", userCount);
+                request.setAttribute("currentPageNo", currentPageNo);
+                request.setAttribute("totalPageCount", totalPageCount);
+            } else {
+                //获取角色列表 并返回
+                RoleService roleService = new RoleServiceImpl();
+                List<Role> roleList = roleService.getRoleList();
+                request.setAttribute("roleList", roleList);
+
+                request.setAttribute("userList", null);
+
+                request.setAttribute("totalCount", 1);
+                request.setAttribute("currentPageNo", 1);
+                request.setAttribute("totalPageCount", 1);
             }
 
-            //获取角色列表
+            //将原有数据发回去
+//            request.setAttribute("queryname", userName);
+            request.setAttribute("queryUserRole", userRole);
+//            request.setAttribute("pageIndex", pageIndex);
+
+            //将数据转发回页面
+            request.getRequestDispatcher("userlist.jsp").forward(request,response);
 
 
-
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException | ClassNotFoundException | IOException | ServletException e) {
             throw new RuntimeException(e);
         }
 

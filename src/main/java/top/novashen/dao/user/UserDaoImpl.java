@@ -1,6 +1,7 @@
 package top.novashen.dao.user;
 
 import com.mysql.cj.util.StringUtils;
+import org.junit.Test;
 import top.novashen.dao.BaseDao;
 import top.novashen.pojo.User;
 
@@ -19,7 +20,7 @@ public class UserDaoImpl implements UserDao{
         ResultSet resultSet = null;
         User user = null;
 
-        String sql = "select * from `smbms_user` where `userCode` = ?";
+        String sql = "select * from `smbms_user` u,`smbms_role` r where u.userRole=r.id and `userCode` = ?";
         Object[] params = {userCode};
 
         if (connection!=null) {
@@ -74,7 +75,7 @@ public class UserDaoImpl implements UserDao{
                 list.add("%"+userName+"%");
             }
             if (userRoleId > 0) {
-                sql.append("and r.roleName = ?");
+                sql.append("and r.id = ?");
                 list.add(userRoleId);
             }
 
@@ -96,6 +97,7 @@ public class UserDaoImpl implements UserDao{
         return count;
     }
 
+
     @Override
     public List<User> getUserList(Connection connection, String userName, int userRoleId, int currentPageNo, int pageSize) throws SQLException {
 
@@ -116,7 +118,7 @@ public class UserDaoImpl implements UserDao{
                 list.add("%"+userName+"%");
             }
             if (userRoleId > 0) {
-                sql.append("and r.roleName = ? ");
+                sql.append("and r.id = ? ");
                 list.add(userRoleId);
             }
 
@@ -161,6 +163,7 @@ public class UserDaoImpl implements UserDao{
         user.setCreationDate(resultSet.getTimestamp("creationDate"));
         user.setModifyBy(resultSet.getInt("modifyBy"));
         user.setModifyDate(resultSet.getTimestamp("modifyDate"));
+        user.setUserRoleName(resultSet.getString("roleName"));
     }
 
 }
