@@ -12,9 +12,18 @@ public interface UserService {
     //修改密码
     Boolean updatePassword(int id, String password) throws SQLException, ClassNotFoundException;
 
+    //添加用户
+    Boolean addUser(User user) throws SQLException, ClassNotFoundException;
+
+    //删除用户
+    Boolean delUser(int userId);
+
     //获取用户数量
     int getUserCount(String userName, int userRoleId) throws SQLException, ClassNotFoundException;
 
     //根据参数获取用户列表
     List<User> getUserList(String userName, int userRoleId, int currentPageNo, int pageSize) throws SQLException, ClassNotFoundException;
+
+    //判断userCode是否存在
+    Boolean isUserExist(String userCode) throws SQLException, ClassNotFoundException;
 }

@@ -56,6 +56,43 @@ public class UserDaoImpl implements UserDao{
     }
 
     @Override
+    public Boolean addUser(Connection connection, User user) throws SQLException {
+
+        PreparedStatement statement = null;
+        int result = 0;
+
+        if (connection!=null){
+            String sql = "insert into smbms_user (userCode,userName,userPassword," +
+                    "userRole,gender,birthday,phone,address,creationDate,createdBy) " +
+                    "values(?,?,?,?,?,?,?,?,?,?)";
+            Object[] params = {user.getUserCode(), user.getUserName(), user.getUserPassword(),
+                    user.getUserRole(), user.getGender(), user.getBirthday(),
+                    user.getPhone(), user.getAddress(), user.getCreationDate(), user.getCreatedBy()};
+            result = BaseDao.execute(connection, sql, params, statement);
+            BaseDao.closeResources(null,statement,null);
+        }
+
+        return result != 0;
+    }
+
+    @Override
+    public Boolean delUser(Connection connection, int userId) throws SQLException {
+
+        PreparedStatement statement = null;
+        int result = 0;
+
+        if (connection!=null){
+            String sql = "DELETE FROM `smbms_user` WHERE id = ?";
+            Object[] params = {userId};
+            result = BaseDao.execute(connection, sql, params, statement);
+            BaseDao.closeResources(null,statement,null);
+        }
+
+        return result != 0;
+    }
+
+
+    @Override
     public int getUserCount(Connection connection, String userName, int userRoleId) throws SQLException {
 
         PreparedStatement statement = null;
@@ -145,6 +182,26 @@ public class UserDaoImpl implements UserDao{
         BaseDao.closeResources(null,statement, resultSet);
 
         return userList;
+
+    }
+
+    @Override
+    public Boolean isUserExist(Connection connection, String userCode) throws SQLException {
+
+        PreparedStatement statement = null;
+        String sql = "select count(1) r from smbms_user where userCode = ?";
+        Object[] params = {userCode};
+        ResultSet resultSet = null;
+        int count = 0;
+
+        resultSet = BaseDao.execute(connection, String.valueOf(sql), params, statement, resultSet);
+
+        //若有，获取
+        while (resultSet.next()) {
+            count = resultSet.getInt("r");
+        }
+
+        return !(count ==0);
 
     }
 

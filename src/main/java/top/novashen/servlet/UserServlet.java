@@ -3,7 +3,6 @@ package top.novashen.servlet;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.mysql.cj.util.StringUtils;
-import top.novashen.dao.role.RoleDaoImpl;
 import top.novashen.pojo.Role;
 import top.novashen.pojo.User;
 import top.novashen.service.role.RoleService;
@@ -11,7 +10,6 @@ import top.novashen.service.role.RoleServiceImpl;
 import top.novashen.service.user.UserService;
 import top.novashen.service.user.UserServiceImpl;
 import top.novashen.util.Constants;
-import top.novashen.util.PageSupport;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,8 +18,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 //与user有关的所有提交到这里
@@ -31,13 +33,103 @@ public class UserServlet extends HttpServlet {
         //获取方法名，判断去哪个方法
         String method = request.getParameter("method");
         if (method==null)return;
-        if (method.equals("savepwd")) {
-            this.updatePassword(request, response);
-        } else if (method.equals("pwdmodify")) {
-            this.verifyPassword(request, response);
-        } else if (method.equals("query")) {
-            this.userQuery(request, response);
+        switch (method) {
+            case "savepwd" -> this.updatePassword(request, response);
+            case "pwdmodify" -> this.verifyPassword(request, response);
+            case "query" -> this.userQuery(request, response);
+            case "add" -> this.userAdd(request,response);
+            case "getrolelist" -> this.getRoleList(request,response);
+            case "deluser" -> this.userDel(request,response);
+            case "ucexist" -> this.isUserExist(request,response);
         }
+    }
+
+    private void isUserExist(HttpServletRequest request, HttpServletResponse response) {
+
+        String userCode = request.getParameter("userCode");
+        //用map的形式传参，以后会很有用，传递json
+        HashMap<String, String> resultMap = new HashMap<>();
+
+        if (StringUtils.isNullOrEmpty(userCode)){
+            UserService userService = new UserServiceImpl();
+
+        }
+
+    }
+
+    private void userDel(HttpServletRequest request, HttpServletResponse response) {
+
+        String temp = request.getParameter("uid");
+        HashMap<String, String> resultMap = new HashMap<>();
+
+        if (!StringUtils.isNullOrEmpty(temp)) {
+            UserService userService = new UserServiceImpl();
+            if (userService.delUser(Integer.parseInt(temp))) {
+                resultMap.put("delResult","true");
+            } else {
+                resultMap.put("delResult","false");
+            }
+        } else {
+            resultMap.put("delResult","notexist");
+        }
+
+        returnResultAsJSON(response,resultMap);
+
+    }
+
+    private void getRoleList(HttpServletRequest request, HttpServletResponse response) {
+        RoleService roleService = new RoleServiceImpl();
+        List<Role> roleList = null;
+        try {
+            roleList = roleService.getRoleList();
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        //把roleList转换成json对象输出
+        returnResultAsJSON(response, roleList);
+
+    }
+
+    private void userAdd(HttpServletRequest request, HttpServletResponse response) {
+
+        String userCode = request.getParameter("userCode");
+        String userName = request.getParameter("userName");
+        String userPassword = request.getParameter("userPassword");
+        String gender = request.getParameter("gender");
+        Date birthday = null;
+        try {
+            birthday = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("birthday"));
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        String phone = request.getParameter("phone");
+        String address = request.getParameter("address");
+        String userRole = request.getParameter("userRole");
+
+        User user = new User();
+        user.setUserCode(userCode);
+        user.setUserName(userName);
+        user.setUserPassword(userPassword);
+        user.setGender(Integer.valueOf(gender));
+        user.setBirthday(birthday);
+        user.setPhone(phone);
+        user.setAddress(address);
+        user.setUserRole(Integer.valueOf(userRole));
+
+        System.out.println("Add user "+user);
+
+        UserService userService = new UserServiceImpl();
+
+        try {
+            if (userService.addUser(user)) {
+                response.sendRedirect(request.getContextPath() + "/jsp/user.do?method=query");
+            } else {
+                request.getRequestDispatcher("useradd.jsp").forward(request, response);
+            }
+        } catch (SQLException | ClassNotFoundException | IOException | ServletException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Override
@@ -97,6 +189,11 @@ public class UserServlet extends HttpServlet {
             resultMap.put("result","error");
         }
         //回传结果json
+        returnResultAsJSON(response, resultMap);
+
+    }
+
+    private void returnResultAsJSON(HttpServletResponse response, Object resultMap) {
         response.setContentType("application/json");
         try {
             PrintWriter writer = response.getWriter();
@@ -107,7 +204,6 @@ public class UserServlet extends HttpServlet {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     //查询用户？
@@ -179,7 +275,7 @@ public class UserServlet extends HttpServlet {
             }
 
             //将原有数据发回去
-//            request.setAttribute("queryname", userName);
+            request.setAttribute("queryUserName", userName);
             request.setAttribute("queryUserRole", userRole);
 //            request.setAttribute("pageIndex", pageIndex);
 

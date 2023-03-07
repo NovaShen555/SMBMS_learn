@@ -58,6 +58,64 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public Boolean addUser(User user) throws SQLException, ClassNotFoundException {
+
+        Connection connection = null;
+        boolean result = false;
+
+        try {
+            connection = BaseDao.getConnection();
+            connection.setAutoCommit(false);//开启JDBC事务。
+            result = userDao.addUser(connection,user);
+            connection.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                if (connection != null) {
+                    connection.rollback();
+                }
+                System.out.println("========rollback=========");
+            } catch (SQLException throwable) {
+                throwable.printStackTrace();
+            }
+        } finally {
+            //在service层进行connection连接的关闭.
+            BaseDao.closeResources(connection,null,null);
+        }
+
+        return result;
+    }
+
+    @Override
+    public Boolean delUser(int userId) {
+
+        Connection connection = null;
+        boolean result = false;
+
+        try {
+            connection = BaseDao.getConnection();
+            connection.setAutoCommit(false);//开启JDBC事务。
+            result = userDao.delUser(connection,userId);
+            connection.commit();//提交
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                if (connection != null) {
+                    connection.rollback();
+                }
+                System.out.println("========rollback=========");
+            } catch (SQLException throwable) {
+                throwable.printStackTrace();
+            }
+        } finally {
+            //在service层进行connection连接的关闭.
+            BaseDao.closeResources(connection,null,null);
+        }
+
+        return  result;
+    }
+
+    @Override
     public int getUserCount(String userName, int userRoleId) throws SQLException, ClassNotFoundException {
 
         Connection connection = null;
@@ -84,12 +142,16 @@ public class UserServiceImpl implements UserService{
         return userList;
     }
 
-    @Test
-    public void test() throws SQLException, ClassNotFoundException {
-        List<User> userList = getUserList("",0,1,5);
-        for (User i : userList){
-            System.out.println(i);
-        }
+    @Override
+    public Boolean isUserExist(String  userCode) throws SQLException, ClassNotFoundException {
+
+        Connection connection = null;
+        connection = BaseDao.getConnection();
+
+        return userDao.isUserExist(connection, userCode);
+
     }
+
+
 
 }
