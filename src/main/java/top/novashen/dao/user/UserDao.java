@@ -28,4 +28,10 @@ public interface UserDao {
     //查询userCode是否存在
     Boolean isUserExist(Connection connection, String userCode) throws SQLException;
 
+    //根据用户id查询用户信息
+    User userQueryById(Connection connection, int userId) throws SQLException;
+
+    //修改用户信息
+    Boolean modifyUser(Connection connection, User user) throws SQLException;
+
 }

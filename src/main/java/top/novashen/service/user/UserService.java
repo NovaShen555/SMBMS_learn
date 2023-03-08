@@ -26,4 +26,10 @@ public interface UserService {
 
     //判断userCode是否存在
     Boolean isUserExist(String userCode) throws SQLException, ClassNotFoundException;
+
+    //通过用户id查询用户信息，显示前端
+    User userQueryById(int userId) throws SQLException, ClassNotFoundException;
+
+    //修改用户信息
+    Boolean userModify(User user) throws SQLException, ClassNotFoundException;
 }

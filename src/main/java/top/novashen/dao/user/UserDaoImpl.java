@@ -194,7 +194,7 @@ public class UserDaoImpl implements UserDao{
         ResultSet resultSet = null;
         int count = 0;
 
-        resultSet = BaseDao.execute(connection, String.valueOf(sql), params, statement, resultSet);
+        resultSet = BaseDao.execute(connection, sql, params, statement, resultSet);
 
         //若有，获取
         while (resultSet.next()) {
@@ -203,6 +203,45 @@ public class UserDaoImpl implements UserDao{
 
         return !(count ==0);
 
+    }
+
+    @Override
+    public User userQueryById(Connection connection, int userId) throws SQLException {
+
+        PreparedStatement statement = null;
+        String sql = "select * from smbms_user s,smbms_role r where s.userRole = r.id and s.id = ?";
+        Object[] params = {userId};
+        ResultSet resultSet = null;
+        User user = new User();
+
+        resultSet = BaseDao.execute(connection,sql,params,statement,resultSet);
+
+        while (resultSet.next()) {
+            getUserFromResultSet(resultSet,user);
+        }
+
+        BaseDao.closeResources(null,statement,resultSet);
+
+        return user;
+
+    }
+
+    @Override
+    public Boolean modifyUser(Connection connection, User user) throws SQLException {
+
+        PreparedStatement statement = null;
+        String sql = "update smbms_user set userName=?," +
+                "gender=?,birthday=?,phone=?,address=?,userRole=?,modifyBy=?,modifyDate=? where id = ? ";
+        Object[] params = {user.getUserName(), user.getGender(), user.getBirthday(),
+                user.getPhone(), user.getAddress(), user.getUserRole(), user.getModifyBy(),
+                user.getModifyDate(), user.getId()};
+        int result = 0;
+
+        result = BaseDao.execute(connection, sql, params, statement);
+
+        BaseDao.closeResources(null,statement,null);
+
+        return result==1;
     }
 
 

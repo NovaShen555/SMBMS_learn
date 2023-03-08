@@ -131,7 +131,7 @@ $(function(){
 	phone.bind("focus",function(){
 		validateTip(phone.next(),{"color":"#666666"},"* 请输入手机号",false);
 	}).bind("blur",function(){
-		var patrn=/^(13[0-9]|15[0-9]|18[0-9])\d{8}$/;
+		var patrn=/^(13[0-9]|14[0-9]|15[0-9]|18[0-9])\d{8}$/;
 		if(phone.val().match(patrn)){
 			validateTip(phone.next(),{"color":"green"},imgYes,true);
 		}else{
@@ -160,9 +160,9 @@ $(function(){
 			ruserPassword.blur();
 		}else if(birthday.attr("validateStatus") != "true"){
 			birthday.blur();
-		}else if(phone.attr("validateStatus") != "true"){
+		}else if(phone.attr("validateStatus") !== "true"){
 			phone.blur();
-		}else if(userRole.attr("validateStatus") != "true"){
+		}else if(userRole.attr("validateStatus") !== "true"){
 			userRole.blur();
 		}else{
 			if(confirm("是否确认提交数据")){
@@ -172,10 +172,7 @@ $(function(){
 	});
 	
 	backBtn.on("click",function(){
-		if(referer != undefined 
-			&& null != referer 
-			&& "" != referer
-			&& "null" != referer
+		if(referer !== undefined && "" !== referer && "null" !== referer
 			&& referer.length > 4){
 		 window.location.href = referer;
 		}else{

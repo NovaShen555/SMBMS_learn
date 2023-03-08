@@ -28,6 +28,13 @@ import java.util.Map;
 
 //与user有关的所有提交到这里
 public class UserServlet extends HttpServlet {
+
+    private UserService userService;
+
+    public UserServlet() {
+        userService = new UserServiceImpl();
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //获取方法名，判断去哪个方法
@@ -41,19 +48,113 @@ public class UserServlet extends HttpServlet {
             case "getrolelist" -> this.getRoleList(request,response);
             case "deluser" -> this.userDel(request,response);
             case "ucexist" -> this.isUserExist(request,response);
+            case "view" -> userQueryById(request,response);
+            case "modify" -> this.userModifyQueryById(request,response);
+            case "modifyexe" -> this.userModifyById(request,response);
         }
+    }
+
+    private void userModifyQueryById(HttpServletRequest request, HttpServletResponse response) {
+
+        String userId = request.getParameter("uid");
+        if (!StringUtils.isNullOrEmpty(userId)) {
+            UserService userService = new UserServiceImpl();
+            try {
+                User user = userService.userQueryById(Integer.parseInt(userId));
+
+                request.setAttribute("user", user);
+                request.getRequestDispatcher("usermodify.jsp").forward(request, response);
+
+            } catch (SQLException | ClassNotFoundException | ServletException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+    private void userModifyById(HttpServletRequest request, HttpServletResponse response) {
+
+        String userId = request.getParameter("uid");
+        Object attribute = request.getSession().getAttribute(Constants.USER_SESSION);
+        if (attribute != null) {
+            User user = (User) attribute;
+            String userName = request.getParameter("userName");
+            String gender = request.getParameter("gender");
+            Date birthday = null;
+            try {
+                birthday = new SimpleDateFormat("yyyy-MM-dd").parse(request.getParameter("birthday"));
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+            String phone = request.getParameter("phone");
+            String address = request.getParameter("address");
+            String userRole = request.getParameter("userRole");
+
+            user.setUserName(userName);
+            user.setGender(Integer.valueOf(gender));
+            user.setBirthday(birthday);
+            user.setPhone(phone);
+            user.setAddress(address);
+            user.setUserRole(Integer.valueOf(userRole));
+
+            try {
+                if (userService.userModify(user)) {
+                    response.sendRedirect(request.getContextPath() + "/jsp/user.do?method=query");
+                } else {
+                    request.getRequestDispatcher("usermodify.jsp").forward(request, response);
+                }
+            } catch (SQLException | ClassNotFoundException | ServletException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void userQueryById(HttpServletRequest request, HttpServletResponse response) {
+
+        String userId = request.getParameter("uid");
+        if (!StringUtils.isNullOrEmpty(userId)) {
+//            UserService userService = new UserServiceImpl();
+            try {
+                User user = userService.userQueryById(Integer.parseInt(userId));
+
+                request.setAttribute("user", user);
+                request.getRequestDispatcher("userview.jsp").forward(request, response);
+
+            } catch (SQLException | ClassNotFoundException | ServletException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 
     private void isUserExist(HttpServletRequest request, HttpServletResponse response) {
 
         String userCode = request.getParameter("userCode");
+
+//        System.out.println("is userCode="+userCode+" exist?");
+
         //用map的形式传参，以后会很有用，传递json
         HashMap<String, String> resultMap = new HashMap<>();
 
-        if (StringUtils.isNullOrEmpty(userCode)){
-            UserService userService = new UserServiceImpl();
-
+        if (!StringUtils.isNullOrEmpty(userCode)){
+//            UserService userService = new UserServiceImpl();
+            try {
+                if (userService.isUserExist(userCode)) {
+                    resultMap.put("userCode","exist");
+                } else {
+                    resultMap.put("userCode","non-exist");
+                }
+            } catch (SQLException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+//            System.out.println("userCode empty");
+            resultMap.put("userCode","exist");
         }
+
+//        System.out.println(resultMap);
+
+        returnResultAsJSON(response,resultMap);
 
     }
 
@@ -63,7 +164,7 @@ public class UserServlet extends HttpServlet {
         HashMap<String, String> resultMap = new HashMap<>();
 
         if (!StringUtils.isNullOrEmpty(temp)) {
-            UserService userService = new UserServiceImpl();
+//            UserService userService = new UserServiceImpl();
             if (userService.delUser(Integer.parseInt(temp))) {
                 resultMap.put("delResult","true");
             } else {
@@ -118,7 +219,7 @@ public class UserServlet extends HttpServlet {
 
         System.out.println("Add user "+user);
 
-        UserService userService = new UserServiceImpl();
+//        UserService userService = new UserServiceImpl();
 
         try {
             if (userService.addUser(user)) {
@@ -220,7 +321,7 @@ public class UserServlet extends HttpServlet {
         int pageSize = Constants.PAGE_SIZE;
         int currentPageNo = 1;
 
-        UserService userService = new UserServiceImpl();
+//        UserService userService = new UserServiceImpl();
 
         //判断前端值是否合法并赋值
         if (userName == null) userName = "";

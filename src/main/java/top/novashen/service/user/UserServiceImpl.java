@@ -133,7 +133,7 @@ public class UserServiceImpl implements UserService{
 
         Connection connection = null;
         connection = BaseDao.getConnection();
-        List<User> userList = new ArrayList<>();
+        List<User> userList;
 
         userList = userDao.getUserList(connection, userName, userRoleId, currentPageNo, pageSize);
 
@@ -148,10 +148,61 @@ public class UserServiceImpl implements UserService{
         Connection connection = null;
         connection = BaseDao.getConnection();
 
-        return userDao.isUserExist(connection, userCode);
+        Boolean result = userDao.isUserExist(connection, userCode);
+
+        BaseDao.closeResources(connection,null,null);
+        return result;
 
     }
 
+    @Override
+    public User userQueryById(int userId) throws SQLException, ClassNotFoundException {
+
+        Connection connection = null;
+        connection = BaseDao.getConnection();
+
+        User user = userDao.userQueryById(connection,userId);
+
+        BaseDao.closeResources(connection,null,null);
+
+        return user;
+    }
+
+    @Override
+    public Boolean userModify(User user) throws SQLException, ClassNotFoundException {
+
+        Connection connection = null;
+        connection = BaseDao.getConnection();
+        Boolean result = false;
+
+        try {
+            connection = BaseDao.getConnection();
+            connection.setAutoCommit(false);//开启JDBC事务。
+            result = userDao.modifyUser(connection,user);
+            connection.commit();//提交
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                if (connection != null) {
+                    connection.rollback();
+                }
+                System.out.println("========rollback=========");
+            } catch (SQLException throwable) {
+                throwable.printStackTrace();
+            }
+        } finally {
+            //在service层进行connection连接的关闭.
+            BaseDao.closeResources(connection,null,null);
+        }
+
+        return  result;
+
+    }
+
+    @Test
+    public void t() throws SQLException, ClassNotFoundException {
+        System.out.println(userQueryById(1));
+    }
 
 
 }
